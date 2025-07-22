@@ -1,18 +1,18 @@
-"use client";
+// "use client";
 
-import { Preloaded, useMutation, usePreloadedQuery } from "convex/react";
-import { api } from "../../convex/_generated/api";
+// import { Preloaded, useMutation, usePreloadedQuery } from "convex/react";
+// import { api } from "../../convex/_generated/api";
 
 export default function Home({
-  preloaded,
+  // preloaded,
 }: {
-  preloaded: Preloaded<typeof api.myFunctions.listNumbers>;
-}) {
-  const data = usePreloadedQuery(preloaded);
-  const addNumber = useMutation(api.myFunctions.addNumber);
+    // preloaded: Preloaded<typeof api.myFunctions.listNumbers>;
+  }) {
+  // const data = usePreloadedQuery(preloaded);
+  // const addNumber = useMutation(api.myFunctions.addNumber);
   return (
     <>
-      <div className="flex flex-col gap-4 bg-slate-200 dark:bg-slate-800 p-4 rounded-md">
+      {/* <div className="flex flex-col gap-4 bg-slate-200 dark:bg-slate-800 p-4 rounded-md">
         <h2 className="text-xl font-bold">Reactive client-loaded data</h2>
         <code>
           <pre>{JSON.stringify(data, null, 2)}</pre>
@@ -25,7 +25,7 @@ export default function Home({
         }}
       >
         Add a random number
-      </button>
+      </button> */}
     </>
   );
 }
