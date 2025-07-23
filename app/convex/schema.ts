@@ -20,11 +20,11 @@ export default defineSchema({
     total_duration: v.float64(),
   }),
   summaries: defineTable({
-    call_id: v.id("reports"),
+    call_id: v.id("calls"),
     summary_text: v.string(),
   }),
   transcriptions: defineTable({
-    call_id: v.id("reports"),
+    call_id: v.id("calls"),
     full_text: v.string(),
     timestamp: v.string(),
   }),
