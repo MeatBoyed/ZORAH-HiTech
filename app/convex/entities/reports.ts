@@ -23,7 +23,15 @@ export const list = query({
 export const show = query({
     args: { reportId: v.id("reports") },
     handler: async (ctx, args) => {
-        return await ctx.db.get(args.reportId);
+        // Include Related calls
+        const report = await ctx.db.get(args.reportId);
+        const calls = await ctx.db.query("calls").filter(q => q.eq(q.field("report_id"), args.reportId)).collect();
+        const callIds = calls.map(call => call._id);
+
+        return {
+            report: report,
+            calls: callIds,
+        }
         // do something with `report`
     },
 });

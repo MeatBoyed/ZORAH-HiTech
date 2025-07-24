@@ -9,14 +9,6 @@ import { v } from "convex/values";
 // //     },
 // // });
 
-// // export const show = query({
-// //     args: { reportId: v.id("reports") },
-// //     handler: async (ctx, args) => {
-// //         const report = await ctx.db.get(args.reportId);
-// //         // do something with `report`
-// //     },
-// // });
-
 export const create = mutation({
     args: {
         call_id: v.id("calls"),

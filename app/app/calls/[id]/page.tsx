@@ -1,17 +1,27 @@
 "use client"
 import { notFound, useParams } from "next/navigation"
+import {
+    getWorkflowById,
+    getCallsByWorkflowId,
+    getSummaryByCallId,
+    getTranscriptionByCallId,
+    getWorkflowIndex,
+} from "@/lib/data"
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Badge } from "@/components/ui/badge"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible"
+import { ChevronDown, ChevronRight } from "lucide-react"
+import { useState } from "react"
+import Link from "next/link"
 import { api } from "@/convex/_generated/api"
 import { useQuery } from "convex/react"
 import { Id } from "@/convex/_generated/dataModel"
-import { getStatusColor } from "@/lib/utils"
 import CallsTable from "@/components/calls/call-table"
+import { getStatusColor } from "@/lib/utils"
 
 
-// Show/Details page for a Report
-// Shows Table of Calls & dropdown to view breif summaries
-export default function ReportDetailPage() {
+export default function WorkflowDetailPage() {
     const params = useParams<{ id: string }>()
     const reportId = params.id
     if (!reportId) {
@@ -21,9 +31,6 @@ export default function ReportDetailPage() {
 
     const report = useQuery(api.entities.reports.show, { reportId: reportId as Id<"reports"> });
     console.log("Fetched report: ", report)
-    // if (!report) {
-    //     notFound()
-    // }
 
     return (
         <div className="space-y-4">
@@ -52,9 +59,6 @@ export default function ReportDetailPage() {
                     <p className="text-muted-foreground leading-relaxed text-sm">{report?.report?.manager_summary}</p>
                 </CardContent>
             </Card>
-
-            {/* Calls Table */}
-            <CallsTable callIds={report?.calls} />
         </div>
     )
 }

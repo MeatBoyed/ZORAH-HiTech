@@ -3,6 +3,7 @@
 import {
   Authenticated,
   Unauthenticated,
+  useQuery,
 } from "convex/react";
 import Link from "next/link";
 import { workflows, type Workflow } from "@/lib/data"
@@ -13,6 +14,9 @@ import { Clock, Phone, Bot, Zap } from "lucide-react"
 import { SignInForm } from "@/components/sign-in-form";
 import { UserProfile } from "@clerk/nextjs"
 import ListReports from "@/components/reports/list";
+import ReportsTable from "@/components/reports/report-table";
+import { api } from "@/convex/_generated/api";
+import { ReportSchema } from "@/convex/types";
 
 // Get next scheduled workflow (tomorrow at 8:00 AM)
 function getNextWorkflow() {
@@ -31,8 +35,18 @@ function getNextWorkflow() {
 
 export default function HomePage() {
   const nextWorkflow = getNextWorkflow()
-  // const workflows = useQuery(api.entities.reports.list, {});
-  // console.log("Reports:", reports);
+  const reports = useQuery(api.entities.reports.list, {});
+
+  // validate to schema
+  // if (!reports) {
+  //   return (
+  //     <div className="text-center text-muted-foreground">
+  //       Loading reports...
+  //     </div>
+  //   );
+  // }
+
+  console.log("Reports:", reports);
 
   return (
     <div className="space-y-6">
@@ -118,7 +132,14 @@ export default function HomePage() {
         </CardContent>
       </Card>
 
-      <ListReports />
+      <ReportsTable reports={reports?.map(r => ({
+        ...r,
+        jobs_today: Number.parseInt(r.jobs_today.toString()),
+        ncrs: Number.parseInt(r.ncrs.toString()),
+        total_cost: Number.parseFloat(r.total_cost.toString()),
+        total_duration: Number.parseFloat(r.total_duration.toString()),
+        report_date: new Date(r.report_date).toLocaleDateString(),
+      }))} />
       {/* </Authenticated> */}
       <Unauthenticated>
         <SignInForm />

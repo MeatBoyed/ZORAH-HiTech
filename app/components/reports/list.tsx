@@ -6,19 +6,9 @@ import { Badge } from "../ui/badge";
 import Link from "next/link";
 import { api } from "@/convex/_generated/api";
 import { useQuery } from "convex/react";
+import { getStatusColor } from "@/lib/utils";
 
-function getStatusColor(status: string) {
-    switch (status) {
-        case "Success":
-            return "bg-green-100 text-green-800 hover:bg-green-100 dark:bg-green-900 dark:text-green-300"
-        case "Partial":
-            return "bg-yellow-100 text-yellow-800 hover:bg-yellow-100 dark:bg-yellow-900 dark:text-yellow-300"
-        case "Failed":
-            return "bg-red-100 text-red-800 hover:bg-red-100 dark:bg-red-900 dark:text-red-300"
-        default:
-            return "bg-gray-100 text-gray-800 hover:bg-gray-100 dark:bg-gray-800 dark:text-gray-300"
-    }
-}
+
 export default function ListReports() {
     const reports = useQuery(api.entities.reports.list, {});
     console.log("Reports:", reports);

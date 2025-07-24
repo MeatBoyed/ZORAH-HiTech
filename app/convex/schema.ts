@@ -1,8 +1,10 @@
 import { defineSchema, defineTable } from "convex/server";
 import { v } from "convex/values";
+import { report } from "process";
 
 export default defineSchema({
   reports: defineTable({
+    _id: v.id("reports"), // unique identifier for the report
     department_name: v.string(),
     report_date: v.string(), // stored as ISO date string
     jobs_today: v.int64(),
@@ -20,6 +22,7 @@ export default defineSchema({
   }),
 
   calls: defineTable({
+    _id: v.id("calls"),
     report_id: v.id("reports"),
     called_about: v.string(),
     manager_name: v.string(),
@@ -30,23 +33,27 @@ export default defineSchema({
   }),
 
   summaries: defineTable({
+    _id: v.id("summaries"),
     call_id: v.id("calls"),
     summary_text: v.string(),
   }),
 
   transcriptions: defineTable({
+    _id: v.id("transcriptions"),
     call_id: v.id("calls"),
     full_text: v.string(),
     timestamp: v.string(), // ISO timestamp string
   }),
 
   usage: defineTable({
+    _id: v.id("usage"),
     billing_month: v.string(), // e.g. "2025-07"
     total_cost: v.float64(),
     total_usage: v.float64(),
   }),
 
   usage_by_call: defineTable({
+    _id: v.id("reports"), // unique identifier for the report
     call_id: v.id("calls"),
     report_id: v.id("reports"),
     billing_month: v.string(),
@@ -56,6 +63,7 @@ export default defineSchema({
   }),
 
   usage_by_report: defineTable({
+    _id: v.id("reports"), // unique identifier for the report
     report_id: v.id("reports"),
     billing_month: v.string(),
     call_count: v.int64(),

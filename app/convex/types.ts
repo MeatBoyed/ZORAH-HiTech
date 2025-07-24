@@ -2,11 +2,12 @@ import z from "zod";
 
 // Simplified individual schemas
 export const ReportSchema = z.object({
+    _id: z.string().optional(),
     department_name: z.string(),
     report_date: z.string(), // ISO date string
-    jobs_today: z.number(), // Changed from bigint for simplicity
+    jobs_today: z.number() || z.bigint(), // Changed from bigint for simplicity
     backlogs: z.boolean(),
-    ncrs: z.number(), // Changed from bigint for simplicity
+    ncrs: z.number() || z.bigint(), // Changed from bigint for simplicity
     stock_issues: z.boolean(),
     delays: z.boolean(),
     supervisor_notes: z.string(),
@@ -18,7 +19,7 @@ export const ReportSchema = z.object({
     total_duration: z.number(),
 });
 
-export const CallSchema = z.object({
+export const InputCallSchema = z.object({
     called_about: z.string(),
     manager_name: z.string(),
     status: z.string(),
@@ -34,11 +35,27 @@ export const CallSchema = z.object({
     }),
 });
 
+export const CallSchema = z.object({
+    _id: z.string().optional(),
+    report_id: z.string(),
+    called_about: z.string(),
+    manager_name: z.string(),
+    status: z.string(),
+    timestamp: z.string(), // ISO timestamp string
+    duration: z.number(),
+    cost: z.number(),
+});
+
 // Simplified HTTP payload - just report and calls
 export const ReportInputSchema = z.object({
     report: ReportSchema,
-    calls: z.array(CallSchema),
+    calls: z.array(InputCallSchema),
 });
+
+export type ReportType = z.infer<typeof ReportSchema>;
+export type Call = z.infer<typeof CallSchema>;
+export type InputCall = z.infer<typeof InputCallSchema>
+// export type Summaries
 // import { z } from "zod";
 
 // // Individual table schemas that match your Convex database schema
