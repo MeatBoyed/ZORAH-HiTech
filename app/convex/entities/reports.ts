@@ -30,10 +30,18 @@ export const show = query({
 
 export const create = mutation({
     args: {
-        date: v.string(),
-        manager: v.string(),
+        department_name: v.string(),
+        report_date: v.string(), // stored as ISO date string
+        jobs_today: v.int64(),
+        backlogs: v.boolean(),
+        ncrs: v.int64(),
+        stock_issues: v.boolean(),
+        delays: v.boolean(),
+        supervisor_notes: v.string(),
+        manager_summary: v.string(),
         status: v.string(),
-        summary: v.string(),
+        pdf_link: v.string(),
+        manager: v.string(),
         total_cost: v.float64(),
         total_duration: v.float64(),
     },
@@ -41,4 +49,17 @@ export const create = mutation({
         const newReport = await ctx.db.insert("reports", args);
         return newReport;
     }
+});
+
+
+// Update the PDF Url in the Report
+export const setReportPDF = mutation({
+    args: { id: v.id("reports"), pdfLink: v.string() },
+    handler: async (ctx, args) => {
+        const { id, pdfLink } = args;
+        console.log(await ctx.db.get(id));
+
+        await ctx.db.patch(id, { pdf_link: pdfLink });
+
+    },
 });

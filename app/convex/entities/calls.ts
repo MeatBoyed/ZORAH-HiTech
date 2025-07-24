@@ -19,13 +19,13 @@ import { v } from "convex/values";
 
 export const create = mutation({
     args: {
-        called_about: v.string(),
-        cost: v.float64(),
-        duration: v.float64(),
-        manager_name: v.string(),
         report_id: v.id("reports"),
+        called_about: v.string(),
+        manager_name: v.string(),
         status: v.string(),
-        timestamp: v.string(),
+        timestamp: v.string(), // ISO timestamp string
+        duration: v.float64(),
+        cost: v.float64(),
     },
     handler: async (ctx, args) => {
         const newCall = await ctx.db.insert("calls", args);
