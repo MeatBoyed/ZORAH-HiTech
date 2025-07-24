@@ -8,7 +8,6 @@ import { Id } from "@/convex/_generated/dataModel"
 import { getStatusColor } from "@/lib/utils"
 import CallsTable from "@/components/calls/call-table"
 
-
 // Show/Details page for a Report
 // Shows Table of Calls & dropdown to view breif summaries
 export default function ReportDetailPage() {
@@ -29,10 +28,11 @@ export default function ReportDetailPage() {
         <div className="space-y-4">
             <div className="flex items-center justify-between">
                 <div>
-                    <h1 className="text-2xl font-bold text-foreground">Workflow #{report?.report?._id}</h1>
+                    <h1 className="text-2xl font-bold text-foreground">Report #{report?.report?._id}</h1>
                     <div className="flex items-center space-x-4 mt-1">
                         <p className="text-muted-foreground text-sm">{new Date(report?.report?.report_date || "").toLocaleDateString()}</p>
                         <Badge className={`${getStatusColor(report?.report?.status || "")} text-xs`}>{report?.report?.status}</Badge>
+                        <Badge className={`text-xs`}>{report?.report?.department_name}</Badge>
                     </div>
                 </div>
                 <Card className="w-fit py-2">

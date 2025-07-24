@@ -10,8 +10,8 @@ export default function CallsListPage() {
     return (
         <div className="space-y-4">
             <div>
-                <h1 className="text-2xl font-bold text-foreground">All Workflows</h1>
-                <p className="text-muted-foreground mt-1 text-sm">Complete history of workflow executions</p>
+                <h1 className="text-2xl font-bold text-foreground">All Calls</h1>
+                <p className="text-muted-foreground mt-1 text-sm">Complete history of call logs</p>
             </div>
 
             {/* <ReportsTable reports={reports?.map(r => ({

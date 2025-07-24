@@ -42,6 +42,7 @@ export const show = query({
             transcription: {
                 full_text: transcription.full_text,
                 timestamp: transcription.timestamp,
+                _id: transcription._id
             },
             summary: {
                 summary_text: summary.summary_text,

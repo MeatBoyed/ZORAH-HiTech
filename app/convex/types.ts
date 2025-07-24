@@ -27,6 +27,7 @@ export const InputCallSchema = z.object({
     duration: z.number(),
     cost: z.number(),
     transcription: z.object({
+        _id: z.string().optional(),
         full_text: z.string(),
         timestamp: z.string(),
     }),

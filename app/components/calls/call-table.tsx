@@ -63,7 +63,7 @@ export function CallRow({ call_id }: { call_id: string }) {
                         </Collapsible>
                         {call?.transcription && (
                             <Link
-                                href={`/transcriptions/${call?.status}`}
+                                href={`/transcriptions/${call?.transcription?._id}`}
                                 className="text-xs text-foreground hover:text-muted-foreground underline underline-offset-2"
                             >
                                 View Transcript
@@ -94,7 +94,8 @@ export function CallRow({ call_id }: { call_id: string }) {
                                     {call?.transcription && (
                                         <div>
                                             <h4 className="font-semibold text-foreground mb-2 text-sm">Full Transcription</h4>
-                                            <p className="text-muted-foreground text-sm leading-relaxed max-w-lg">{call?.transcription?.full_text}</p>
+                                            {/* Limit to 150 characters */}
+                                            <p className="text-muted-foreground text-sm leading-relaxed max-w-lg">{call?.transcription?.full_text.slice(0, 150)}{call?.transcription?.full_text.length > 150 ? "..." : ""}</p>
                                         </div>
                                     )}
                                 </div>

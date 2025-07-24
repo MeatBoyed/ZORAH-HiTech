@@ -1,20 +1,22 @@
-import { notFound } from "next/navigation"
+"use client"
+import { notFound, useParams } from "next/navigation"
 import Link from "next/link"
-import { transcriptions, getCallById, getWorkflowById, getWorkflowIndex } from "@/lib/data"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { ArrowLeft } from "lucide-react"
+import { api } from "@/convex/_generated/api"
+import { Id } from "@/convex/_generated/dataModel"
+import { useQuery } from "convex/react"
 
-export default function TranscriptionDetailPage({ params }: { params: { id: string } }) {
-    const transcription = transcriptions.find((t) => t.id === params.id)
-
-    if (!transcription) {
+export default function TranscriptionDetailPage() {
+    const params = useParams<{ id: string }>()
+    const transcriptionId = params.id
+    if (!transcriptionId) {
         notFound()
     }
 
-    const call = getCallById(transcription.callId)
-    const workflow = call ? getWorkflowById(call.workflowId) : null
-    const workflowIndex = workflow ? getWorkflowIndex(workflow.id) : null
+    // Query Data
+    const transcription = useQuery(api.entities.transcriptions.show, { transcriptionId: transcriptionId as Id<"transcriptions"> });
 
     return (
         <div className="space-y-4">
@@ -27,11 +29,11 @@ export default function TranscriptionDetailPage({ params }: { params: { id: stri
                 </Link>
                 <div>
                     <h1 className="text-2xl font-bold text-foreground">Transcription Details</h1>
-                    <p className="text-muted-foreground mt-1 text-sm">{new Date(transcription.timestamp).toLocaleString()}</p>
+                    <p className="text-muted-foreground mt-1 text-sm">{new Date(transcription?.transcription?.timestamp || "").toLocaleString()}</p>
                 </div>
             </div>
 
-            {call && workflow && workflowIndex && (
+            {transcription?.call && (
                 <Card>
                     <CardHeader className="pb-3">
                         <CardTitle className="text-lg">Call Information</CardTitle>
@@ -40,32 +42,32 @@ export default function TranscriptionDetailPage({ params }: { params: { id: stri
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div>
                                 <p className="text-sm font-medium text-muted-foreground">Manager</p>
-                                <p className="text-foreground text-sm">{call.managerName}</p>
+                                <p className="text-foreground text-sm">{transcription?.call?.manager_name}</p>
                             </div>
                             <div>
                                 <p className="text-sm font-medium text-muted-foreground">Subject</p>
-                                <p className="text-foreground text-sm">{call.calledAbout}</p>
+                                <p className="text-foreground text-sm">{transcription?.call?.called_about}</p>
                             </div>
                             <div>
                                 <p className="text-sm font-medium text-muted-foreground">Duration</p>
-                                <p className="text-foreground text-sm">{call.duration} minutes</p>
+                                <p className="text-foreground text-sm">{transcription?.call.duration} minutes</p>
                             </div>
                             <div>
                                 <p className="text-sm font-medium text-muted-foreground">Workflow</p>
                                 <Link
-                                    href={`/workflows/${workflow.id}`}
+                                    href={`/report/${transcription?.call.report_id}`}
                                     className="text-foreground hover:text-muted-foreground font-medium text-sm underline underline-offset-2"
                                 >
-                                    Workflow #{workflowIndex}
+                                    Report #{transcription?.call?.report_id}
                                 </Link>
                             </div>
                             <div>
                                 <p className="text-sm font-medium text-muted-foreground">Date</p>
-                                <p className="text-foreground text-sm">{new Date(workflow.date).toLocaleDateString()}</p>
+                                <p className="text-foreground text-sm">{new Date(transcription?.call.timestamp || "").toLocaleDateString()}</p>
                             </div>
                             <div>
                                 <p className="text-sm font-medium text-muted-foreground">Cost</p>
-                                <p className="text-foreground text-sm">${call.cost.toFixed(2)}</p>
+                                <p className="text-foreground text-sm">${transcription?.call?.cost.toFixed(2)}</p>
                             </div>
                         </div>
                     </CardContent>
@@ -79,7 +81,7 @@ export default function TranscriptionDetailPage({ params }: { params: { id: stri
                 <CardContent>
                     <div className="prose max-w-none">
                         <p className="text-muted-foreground leading-relaxed whitespace-pre-wrap text-sm">
-                            {transcription.fullText}
+                            {transcription?.transcription?.full_text || "No transcription available."}
                         </p>
                     </div>
                 </CardContent>

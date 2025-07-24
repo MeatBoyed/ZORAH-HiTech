@@ -11,8 +11,9 @@ import { ThemeToggle } from "@/components/theme-toggle"
 const navItems = [
     { href: "/", label: "Home" },
     { href: "/reports", label: "Reports" },
-    { href: "/transcriptions", label: "Transcriptions" },
-    { href: "/summaries", label: "Summaries" },
+    { href: "/calls", label: "Calls" },
+    // { href: "/transcriptions", label: "Transcriptions" },
+    // { href: "/summaries", label: "Summaries" },
     { href: "/usage", label: "Usage" },
 ]
 
