@@ -1,22 +1,14 @@
 "use client"
 
 import {
-  Authenticated,
   Unauthenticated,
   useQuery,
 } from "convex/react";
-import Link from "next/link";
-import { workflows, type Workflow } from "@/lib/data"
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { Badge } from "@/components/ui/badge"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Clock, Phone, Bot, Zap } from "lucide-react"
 import { SignInForm } from "@/components/sign-in-form";
-import { UserProfile } from "@clerk/nextjs"
-import ListReports from "@/components/reports/list";
 import ReportsTable from "@/components/reports/report-table";
 import { api } from "@/convex/_generated/api";
-import { ReportSchema } from "@/convex/types";
 
 // Get next scheduled workflow (tomorrow at 8:00 AM)
 function getNextWorkflow() {
@@ -36,15 +28,6 @@ function getNextWorkflow() {
 export default function HomePage() {
   const nextWorkflow = getNextWorkflow()
   const reports = useQuery(api.entities.reports.list, {});
-
-  // validate to schema
-  // if (!reports) {
-  //   return (
-  //     <div className="text-center text-muted-foreground">
-  //       Loading reports...
-  //     </div>
-  //   );
-  // }
 
   console.log("Reports:", reports);
 

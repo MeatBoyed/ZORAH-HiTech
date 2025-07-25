@@ -5,8 +5,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { ArrowLeft } from "lucide-react"
 
-export default function SummaryDetailPage({ params }: { params: { id: string } }) {
-    const summary = summaries.find((s) => s.id === params.id)
+export default function SummaryDetailPage() {
+    const summary = summaries.find((s) => s.id === "askjasjd")
 
     if (!summary) {
         notFound()

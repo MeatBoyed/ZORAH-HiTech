@@ -1,25 +1,11 @@
 "use client"
 import { notFound, useParams } from "next/navigation"
-import {
-    getWorkflowById,
-    getCallsByWorkflowId,
-    getSummaryByCallId,
-    getTranscriptionByCallId,
-    getWorkflowIndex,
-} from "@/lib/data"
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Badge } from "@/components/ui/badge"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible"
-import { ChevronDown, ChevronRight } from "lucide-react"
-import { useState } from "react"
-import Link from "next/link"
 import { api } from "@/convex/_generated/api"
 import { useQuery } from "convex/react"
 import { Id } from "@/convex/_generated/dataModel"
-import CallsTable from "@/components/calls/call-table"
 import { getStatusColor } from "@/lib/utils"
-
 
 export default function WorkflowDetailPage() {
     const params = useParams<{ id: string }>()

@@ -88,9 +88,7 @@ export function PaginatedTable<T>({
             const filterValue = filterValues[filter.id]
             if (filterValue && filterValue !== 'all') {
                 // This is a simplified filter - you might need custom filtering logic per filter
-                // eslint-disable-next-line 
-                // @typescript-eslint/no-explicit-any
-                const value = String((item as any)[filter.id]).toLowerCase()
+                const value = String((item as Record<string, unknown>)[filter.id]).toLowerCase()
                 if (value !== filterValue.toLowerCase()) {
                     return false
                 }
@@ -173,9 +171,7 @@ export function PaginatedTable<T>({
                                             ['@md']: column.hidden === 'md' ? 'table-cell' : undefined,
                                             ['@lg']: column.hidden === 'lg' ? 'table-cell' : undefined,
                                             ['@xl']: column.hidden === 'xl' ? 'table-cell' : undefined,
-                                            // eslint-disable-next-line
-                                            // @typescript-eslint/no-explicit-any
-                                        } as any}
+                                        } as React.CSSProperties}
                                     >
                                         {column.header}
                                     </TableHead>
@@ -202,7 +198,7 @@ export function PaginatedTable<T>({
                                                     ['@xl']: column.hidden === 'xl' ? 'table-cell' : undefined,
                                                     // eslint-disable-next-line 
                                                     // @typescript-eslint/no-explicit-any
-                                                } as any}
+                                                } as React.CSSProperties}
                                             >
                                                 {column.accessor(item)}
                                             </TableCell>
