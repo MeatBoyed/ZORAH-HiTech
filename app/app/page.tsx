@@ -1,12 +1,12 @@
 "use client"
 
 import {
-  Unauthenticated,
+  // Unauthenticated,
   useQuery,
 } from "convex/react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Clock, Phone, Bot, Zap } from "lucide-react"
-import { SignInForm } from "@/components/sign-in-form";
+// import { SignInForm } from "@/components/sign-in-form";
 import ReportsTable from "@/components/reports/report-table";
 import { api } from "@/convex/_generated/api";
 
@@ -121,12 +121,11 @@ export default function HomePage() {
         ncrs: Number.parseInt(r.ncrs.toString()),
         total_cost: Number.parseFloat(r.total_cost.toString()),
         total_duration: Number.parseFloat(r.total_duration.toString()),
-        report_date: new Date(r.report_date).toLocaleDateString(),
       }))} />
       {/* </Authenticated> */}
-      <Unauthenticated>
+      {/* <Unauthenticated>
         <SignInForm />
-      </Unauthenticated>
+      </Unauthenticated> */}
     </div>
   )
 }

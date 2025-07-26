@@ -1,3 +1,5 @@
+"use client"
+
 import Link from "next/link"
 import { FilterDefinition, ColumnDefinition } from "../ui/custom-table"
 import { ReportType } from "@/convex/types"

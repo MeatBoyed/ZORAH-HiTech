@@ -1,22 +1,21 @@
-"use client"
-import { notFound, useParams } from "next/navigation"
+import { notFound } from "next/navigation"
 import Link from "next/link"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { ArrowLeft } from "lucide-react"
 import { api } from "@/convex/_generated/api"
 import { Id } from "@/convex/_generated/dataModel"
-import { useQuery } from "convex/react"
+import { fetchQuery } from "convex/nextjs"
 
-export default function TranscriptionDetailPage() {
-    const params = useParams<{ id: string }>()
-    const transcriptionId = params.id
+export default async function TranscriptionDetailPage({ params }: { params: Promise<{ id: string }> }) {
+    // const params = useParams<{ id: string }>()
+    const transcriptionId = (await params).id
     if (!transcriptionId) {
         notFound()
     }
 
     // Query Data
-    const transcription = useQuery(api.entities.transcriptions.show, { transcriptionId: transcriptionId as Id<"transcriptions"> });
+    const transcription = await fetchQuery(api.entities.transcriptions.show, { transcriptionId: transcriptionId as Id<"transcriptions"> });
 
     return (
         <div className="space-y-4">

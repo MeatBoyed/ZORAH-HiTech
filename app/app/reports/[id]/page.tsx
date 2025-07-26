@@ -1,24 +1,27 @@
-"use client"
-import { notFound, useParams } from "next/navigation"
+// "use client"
+import { notFound } from "next/navigation"
 import { Badge } from "@/components/ui/badge"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { api } from "@/convex/_generated/api"
-import { useQuery } from "convex/react"
+// import { useQuery } from "convex/react"
 import { Id } from "@/convex/_generated/dataModel"
 import { getStatusColor } from "@/lib/utils"
 import CallsTable from "@/components/calls/call-table"
+import { fetchQuery } from "convex/nextjs"
 
 // Show/Details page for a Report
 // Shows Table of Calls & dropdown to view breif summaries
-export default function ReportDetailPage() {
-    const params = useParams<{ id: string }>()
-    const reportId = params.id
+export default async function ReportDetailPage({ params }: { params: Promise<{ id: string }> }) {
+    // const params = useParams<{ id: string }>()
+    const reportId = (await params).id
+    console.log("Params:", reportId)
     if (!reportId) {
         notFound()
     }
     console.log("Params Report ID:", reportId)
 
-    const report = useQuery(api.entities.reports.show, { reportId: reportId as Id<"reports"> });
+    // const report = useQuery(api.entities.reports.show, { reportId: reportId as Id<"reports"> });
+    const report = await fetchQuery(api.entities.reports.show, { reportId: reportId as Id<"reports"> });
     console.log("Fetched report: ", report)
     // if (!report) {
     //     notFound()

@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
+import { Skeleton } from "@/components/ui/skeleton" // Assuming you have this component already
 
 export type ColumnDefinition<T> = {
     id: string
@@ -24,7 +25,7 @@ export type FilterDefinition = {
 }
 
 type PaginatedTableProps<T> = {
-    data: T[]
+    data?: T[]
     columns: ColumnDefinition<T>[]
     filters?: FilterDefinition[]
     pageSizeOptions?: number[]
@@ -73,7 +74,7 @@ export function PaginatedTable<T>({
     }
 
     // Filter data based on search and filters
-    const filteredData = data.filter((item) => {
+    const filteredData = data?.filter((item) => {
         // Apply search
         if (searchQuery) {
             const matches = columns.some(column => {
@@ -99,9 +100,9 @@ export function PaginatedTable<T>({
     })
 
     // Pagination
-    const totalPages = Math.ceil(filteredData.length / pageSize)
+    const totalPages = filteredData ? Math.ceil(filteredData.length / pageSize) : 0
     const startIndex = (currentPage - 1) * pageSize
-    const paginatedData = filteredData.slice(startIndex, startIndex + pageSize)
+    const paginatedData = filteredData?.slice(startIndex, startIndex + pageSize)
 
     // Handle page changes
     const goToPage = (page: number) => {
@@ -179,7 +180,18 @@ export function PaginatedTable<T>({
                             </TableRow>
                         </TableHeader>
                         <TableBody className="">
-                            {paginatedData.length > 0 ? (
+                            {/* Loading Skeleton */}
+                            {data === undefined || paginatedData == undefined ? (
+                                Array.from({ length: 4 }).map((_, rowIndex) => (
+                                    <TableRow key={`skeleton-${rowIndex}`}>
+                                        {columns.map((column, colIndex) => (
+                                            <TableCell key={`skeleton-cell-${colIndex}`}>
+                                                <Skeleton className="h-5 w-full" />
+                                            </TableCell>
+                                        ))}
+                                    </TableRow>
+                                ))
+                            ) : paginatedData.length > 0 ? (
                                 paginatedData.map((item, index) => (
                                     <TableRow key={index} className="space-x-10 ">
                                         {columns.map((column) => (
@@ -218,7 +230,7 @@ export function PaginatedTable<T>({
             </Card>
 
             {/* Pagination */}
-            {filteredData.length > 0 && (
+            {filteredData && filteredData.length > 0 && (
                 <div className="flex items-center justify-between">
                     <div className="text-sm text-muted-foreground">
                         Showing {startIndex + 1}-{Math.min(startIndex + pageSize, filteredData.length)} of{" "}
@@ -285,3 +297,222 @@ export function PaginatedTable<T>({
         </div>
     )
 }
+
+
+// type PaginatedTableProps<T> = {
+//     data?: T[] // made optional
+//     columns: ColumnDefinition<T>[]
+//     filters?: FilterDefinition[]
+//     pageSizeOptions?: number[]
+//     defaultPageSize?: number
+//     searchable?: boolean
+//     className?: string
+// }
+
+// export function PaginatedTable<T>({
+//     data,
+//     columns,
+//     filters = [],
+//     pageSizeOptions = [5, 10, 20, 50],
+//     defaultPageSize = 20,
+//     searchable = true,
+//     className = ''
+// }: PaginatedTableProps<T>) {
+//     const router = useRouter()
+//     const pathname = usePathname()
+//     const searchParams = useSearchParams()
+
+//     const currentPage = parseInt(searchParams.get('page') || '1')
+//     const pageSize = parseInt(searchParams.get('pageSize') || defaultPageSize.toString())
+//     const searchQuery = searchParams.get('search') || ''
+
+//     const filterValues = filters.reduce((acc, filter) => {
+//         acc[filter.id] = searchParams.get(filter.id) || 'all'
+//         return acc
+//     }, {} as Record<string, string>)
+
+//     const updateParams = (newParams: Record<string, string>) => {
+//         const params = new URLSearchParams(searchParams.toString())
+//         Object.entries(newParams).forEach(([key, value]) => {
+//             if (value) {
+//                 params.set(key, value)
+//             } else {
+//                 params.delete(key)
+//             }
+//         })
+//         router.push(`${pathname}?${params.toString()}`)
+//     }
+
+//     const filteredData = data?.filter((item) => {
+//         if (searchQuery) {
+//             const matches = columns.some(column => {
+//                 const value = column.accessor(item)
+//                 return String(value).toLowerCase().includes(searchQuery.toLowerCase())
+//             })
+//             if (!matches) return false
+//         }
+
+//         for (const filter of filters) {
+//             const filterValue = filterValues[filter.id]
+//             if (filterValue && filterValue !== 'all') {
+//                 const value = String((item as Record<string, unknown>)[filter.id]).toLowerCase()
+//                 if (value !== filterValue.toLowerCase()) return false
+//             }
+//         }
+
+//         return true
+//     })
+
+//     const totalPages = data ? Math.ceil((filteredData?.length ?? 0) / pageSize) : 1
+//     const startIndex = (currentPage - 1) * pageSize
+//     const paginatedData = data ? (filteredData ?? []).slice(startIndex, startIndex + pageSize) : []
+
+//     const goToPage = (page: number) => {
+//         updateParams({ page: Math.max(1, Math.min(page, totalPages)).toString() })
+//     }
+
+//     const isLoading = data === undefined
+//     const skeletonRowCount = 4
+
+//     return (
+//         <div className={`space-y-4 w-full ${className}`}>
+//             {/* Filters */}
+//             <div className="flex flex-col sm:flex-row gap-4">
+//                 {searchable && (
+//                     <div className="relative flex-1">
+//                         <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+//                         <Input
+//                             placeholder="Search..."
+//                             className="pl-8"
+//                             value={searchQuery}
+//                             onChange={(e) => updateParams({
+//                                 search: e.target.value,
+//                                 page: '1'
+//                             })}
+//                         />
+//                     </div>
+//                 )}
+
+//                 {filters.map((filter) => (
+//                     <Select
+//                         key={filter.id}
+//                         value={filterValues[filter.id]}
+//                         onValueChange={(value) => updateParams({
+//                             [filter.id]: value,
+//                             page: '1'
+//                         })}
+//                     >
+//                         <SelectTrigger className="w-full sm:w-[180px]">
+//                             <SelectValue placeholder={`Filter by ${filter.id}`} />
+//                         </SelectTrigger>
+//                         <SelectContent>
+//                             <SelectItem value="all">All {filter.id}</SelectItem>
+//                             {filter.options?.map((option) => (
+//                                 <SelectItem key={option.value} value={option.value}>
+//                                     {option.label}
+//                                 </SelectItem>
+//                             ))}
+//                         </SelectContent>
+//                     </Select>
+//                 ))}
+//             </div>
+
+//             {/* Table */}
+//             <Card className="py-0">
+//                 <div className="rounded-md border px-3">
+//                     <Table>
+//                         <TableHeader>
+//                             <TableRow>
+//                                 {columns.map((column) => (
+//                                     <TableHead
+//                                         key={column.id}
+//                                         className={column.className}
+//                                         style={{ display: column.hidden ? 'none' : 'table-cell' }}
+//                                     >
+//                                         {column.header}
+//                                     </TableHead>
+//                                 ))}
+//                             </TableRow>
+//                         </TableHeader>
+//                         <TableBody>
+//                             {isLoading ? (
+//                                 Array.from({ length: skeletonRowCount }).map((_, rowIndex) => (
+//                                     <TableRow key={`skeleton-${rowIndex}`}>
+//                                         {columns.map((column, colIndex) => (
+//                                             <TableCell key={`skeleton-cell-${colIndex}`}>
+//                                                 <Skeleton className="h-4 w-full" />
+//                                             </TableCell>
+//                                         ))}
+//                                     </TableRow>
+//                                 ))
+//                             ) : paginatedData.length > 0 ? (
+//                                 paginatedData.map((item, index) => (
+//                                     <TableRow key={index}>
+//                                         {columns.map((column) => (
+//                                             <TableCell key={column.id} className={column.className}>
+//                                                 {column.accessor(item)}
+//                                             </TableCell>
+//                                         ))}
+//                                     </TableRow>
+//                                 ))
+//                             ) : (
+//                                 <TableRow>
+//                                     <TableCell colSpan={columns.length} className="h-24 text-center">
+//                                         No results found.
+//                                     </TableCell>
+//                                 </TableRow>
+//                             )}
+//                         </TableBody>
+//                     </Table>
+//                 </div>
+//             </Card>
+
+//             {/* Pagination */}
+//             {!isLoading && (filteredData?.length ?? 0) > 0 && (
+//                 <div className="flex items-center justify-between">
+//                     <div className="text-sm text-muted-foreground">
+//                         Showing {startIndex + 1}-{Math.min(startIndex + pageSize, filteredData?.length ?? 0)} of{" "}
+//                         {filteredData?.length} items
+//                     </div>
+//                     <div className="flex items-center space-x-2">
+//                         <Select
+//                             value={pageSize.toString()}
+//                             onValueChange={(value) => updateParams({
+//                                 pageSize: value,
+//                                 page: '1'
+//                             })}
+//                         >
+//                             <SelectTrigger className="w-[70px]">
+//                                 <SelectValue placeholder={defaultPageSize.toString()} />
+//                             </SelectTrigger>
+//                             <SelectContent>
+//                                 {pageSizeOptions.map((size) => (
+//                                     <SelectItem key={size} value={size.toString()}>
+//                                         {size}
+//                                     </SelectItem>
+//                                 ))}
+//                             </SelectContent>
+//                         </Select>
+//                         <div className="flex items-center space-x-2">
+//                             <Button variant="outline" size="icon" onClick={() => goToPage(1)} disabled={currentPage === 1}>
+//                                 <ChevronsLeft className="h-4 w-4" />
+//                             </Button>
+//                             <Button variant="outline" size="icon" onClick={() => goToPage(currentPage - 1)} disabled={currentPage === 1}>
+//                                 <ChevronLeft className="h-4 w-4" />
+//                             </Button>
+//                             <span className="text-sm">
+//                                 Page {currentPage} of {totalPages || 1}
+//                             </span>
+//                             <Button variant="outline" size="icon" onClick={() => goToPage(currentPage + 1)} disabled={currentPage === totalPages}>
+//                                 <ChevronRight className="h-4 w-4" />
+//                             </Button>
+//                             <Button variant="outline" size="icon" onClick={() => goToPage(totalPages)} disabled={currentPage === totalPages}>
+//                                 <ChevronsRight className="h-4 w-4" />
+//                             </Button>
+//                         </div>
+//                     </div>
+//                 </div>
+//             )}
+//         </div>
+//     )
+// }

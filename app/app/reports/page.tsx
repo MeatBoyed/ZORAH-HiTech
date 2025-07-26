@@ -1,41 +1,30 @@
-"use client"
+// "use client"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import ReportsTable from "@/components/reports/report-table"
-import { useQuery } from "convex/react"
+import { fetchQuery } from "convex/nextjs"
 import { api } from "@/convex/_generated/api"
 
 // List page for Reports (Shows all available reports)
-export default function Reports() {
-    const reports = useQuery(api.entities.reports.list, {});
-    // const [startDate, setStartDate] = useState("")
-    // const [endDate, setEndDate] = useState("")
+export default async function Reports() {
+    // const reports = useQuery(api.entities.reports.list, {});
+    const reports = await fetchQuery(api.entities.reports.list, {});
+    console.log("Fetched Reports: ", reports)
 
-    // const filteredWorkflows = useMemo(() => {
-    //     if (!startDate && !endDate) return workflows
-
-    //     return workflows.filter((workflow) => {
-    //         const workflowDate = new Date(workflow.date)
-    //         const start = startDate ? new Date(startDate) : null
-    //         const end = endDate ? new Date(endDate) : null
-
-    //         if (start && end) {
-    //             return workflowDate >= start && workflowDate <= end
-    //         } else if (start) {
-    //             return workflowDate >= start
-    //         } else if (end) {
-    //             return workflowDate <= end
-    //         }
-    //         return true
-    //     })
-    // }, [startDate, endDate])
+    if (!reports || reports.length === 0) {
+        return (
+            <div className="text-center text-muted-foreground">
+                No reports available.
+            </div>
+        )
+    }
 
     return (
         <div className="space-y-4">
             <div>
-                <h1 className="text-2xl font-bold text-foreground">All Workflows</h1>
-                <p className="text-muted-foreground mt-1 text-sm">Complete history of workflow executions</p>
+                <h1 className="text-2xl font-bold text-foreground">Department Reports</h1>
+                <p className="text-muted-foreground mt-1 text-sm">Complete history of your reports</p>
             </div>
 
             {/* Date Filtering */}
@@ -95,7 +84,6 @@ export default function Reports() {
                 ncrs: Number.parseInt(r.ncrs.toString()),
                 total_cost: Number.parseFloat(r.total_cost.toString()),
                 total_duration: Number.parseFloat(r.total_duration.toString()),
-                report_date: new Date(r.report_date).toLocaleDateString(),
             }))} />
         </div>
     )

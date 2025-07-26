@@ -4,13 +4,13 @@ import { ReportColumns, ReportFilters } from "./def";
 import { ReportType } from "@/convex/types"
 
 export default function ReportsTable({ reports }: { reports?: ReportType[] }) {
-    if (!reports) {
-        return (
-            <div className="text-center text-muted-foreground">
-                No reports available.
-            </div>
-        )
-    }
+    // if (!reports) {
+    //     return (
+    //         <div className="text-center text-muted-foreground">
+    //             No reports available.
+    //         </div>
+    //     )
+    // }
 
     // get all unique categories of services
     // const categories = Array.from(
