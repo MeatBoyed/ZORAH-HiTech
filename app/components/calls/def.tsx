@@ -1,7 +1,6 @@
 import Link from "next/link"
 import { FilterDefinition, ColumnDefinition } from "../ui/custom-table"
 import { Call } from "@/convex/types"
-import { APP_URL } from "../reports/def"
 import { Badge } from "../ui/badge"
 import { getStatusColor } from "@/lib/utils"
 
@@ -70,7 +69,7 @@ export const CallColumns: ColumnDefinition<Call>[] = [
             <>
                 <Link
                     href={
-                        APP_URL + `/calls/${call._id}`
+                        `/calls/${call._id}`
                     }
                 >
                     View

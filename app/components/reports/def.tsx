@@ -5,7 +5,7 @@ import { format } from "date-fns";
 import { Badge } from "../ui/badge";
 import { getStatusColor } from "@/lib/utils";
 
-export const APP_URL = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
+// export const APP_URL = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
 
 export const formatDate = (date: string | Date) => {
     try {
@@ -111,7 +111,7 @@ export const ReportColumns: ColumnDefinition<ReportType>[] = [
             <>
                 <Link
                     href={
-                        APP_URL + `/reports/${report._id}`
+                        `/reports/${report._id}`
                     }
                 >
                     View

@@ -1,3 +1,4 @@
+import { env } from "process";
 import { api } from "./_generated/api";
 import { Id } from "./_generated/dataModel";
 import { httpAction } from "./_generated/server";
@@ -78,7 +79,8 @@ export const uploadReportPDF = httpAction(async (ctx, request) => {
     console.log("Stored PDF with ID:", storageId);
 
     // Step 3: Update the report with the PDF link
-    await ctx.runMutation(api.entities.reports.setReportPDF, { id: reportId as Id<"reports">, pdfLink: storageId });
+    const pdfLink = `${env.NEXT_PUBLIC_CONVEX_URL}/api/storage/${storageId}`
+    await ctx.runMutation(api.entities.reports.setReportPDF, { id: reportId as Id<"reports">, pdfLink });
     // await ctx.runMutation(api.entities.reports.setReportPDF, { id: reportId, pdfLink: storageId });
 
     // Step 4: Return a response with the correct CORS headers
