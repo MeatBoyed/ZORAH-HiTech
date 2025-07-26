@@ -6,6 +6,8 @@ import ReportsTable from "@/components/reports/report-table"
 import { fetchQuery } from "convex/nextjs"
 import { api } from "@/convex/_generated/api"
 
+export const dynamic = "force-dynamic"
+
 // List page for Reports (Shows all available reports)
 export default async function Reports() {
     // const reports = useQuery(api.entities.reports.list, {});

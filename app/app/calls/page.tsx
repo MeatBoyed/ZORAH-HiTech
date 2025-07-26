@@ -1,10 +1,10 @@
-"use client"
-import { useQuery } from "convex/react"
 import { api } from "@/convex/_generated/api"
 import CallsTable from "@/components/calls/call-table";
+import { fetchQuery } from "convex/nextjs";
 
-export default function CallsListPage() {
-    const calls = useQuery(api.entities.calls.listIds, {});
+export const dynamic = "force-dynamic"
+export default async function CallsListPage() {
+    const calls = await fetchQuery(api.entities.calls.listIds, {});
 
     return (
         <div className="space-y-4">

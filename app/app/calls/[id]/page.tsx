@@ -1,4 +1,3 @@
-"use client"
 import { notFound, useParams } from "next/navigation"
 import { Badge } from "@/components/ui/badge"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
@@ -6,16 +5,18 @@ import { api } from "@/convex/_generated/api"
 import { useQuery } from "convex/react"
 import { Id } from "@/convex/_generated/dataModel"
 import { getStatusColor } from "@/lib/utils"
+import { fetchQuery } from "convex/nextjs"
 
-export default function WorkflowDetailPage() {
-    const params = useParams<{ id: string }>()
-    const reportId = params.id
+export const dynamic = "force-dynamic"
+export default async function CallDetailsPage({ params }: { params: Promise<{ id: string }> }) {
+    // const params = useParams<{ id: string }>()
+    const reportId = (await params).id
     if (!reportId) {
         notFound()
     }
     console.log("Params Report ID:", reportId)
 
-    const report = useQuery(api.entities.reports.show, { reportId: reportId as Id<"reports"> });
+    const report = await fetchQuery(api.entities.reports.show, { reportId: reportId as Id<"reports"> });
     console.log("Fetched report: ", report)
 
     return (

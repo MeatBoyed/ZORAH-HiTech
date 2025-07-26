@@ -9,6 +9,8 @@ import { getStatusColor } from "@/lib/utils"
 import CallsTable from "@/components/calls/call-table"
 import { fetchQuery } from "convex/nextjs"
 
+export const dynamic = "force-dynamic"
+
 // Show/Details page for a Report
 // Shows Table of Calls & dropdown to view breif summaries
 export default async function ReportDetailPage({ params }: { params: Promise<{ id: string }> }) {

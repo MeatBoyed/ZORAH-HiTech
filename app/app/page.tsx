@@ -1,14 +1,15 @@
-"use client"
+// "use client"
 
-import {
-  // Unauthenticated,
-  useQuery,
-} from "convex/react";
+// import {
+//   // Unauthenticated,
+//   useQuery,
+// } from "convex/react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Clock, Phone, Bot, Zap } from "lucide-react"
 // import { SignInForm } from "@/components/sign-in-form";
 import ReportsTable from "@/components/reports/report-table";
 import { api } from "@/convex/_generated/api";
+import { fetchQuery } from "convex/nextjs";
 
 // Get next scheduled workflow (tomorrow at 8:00 AM)
 function getNextWorkflow() {
@@ -25,9 +26,12 @@ function getNextWorkflow() {
   }
 }
 
-export default function HomePage() {
+export const dynamic = "force-dynamic"
+
+export default async function HomePage() {
   const nextWorkflow = getNextWorkflow()
-  const reports = useQuery(api.entities.reports.list, {});
+  // const reports = useQuery(api.entities.reports.list, {});
+  const reports = await fetchQuery(api.entities.reports.list, {});
 
   console.log("Reports:", reports);
 

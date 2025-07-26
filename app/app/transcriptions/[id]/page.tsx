@@ -7,6 +7,7 @@ import { api } from "@/convex/_generated/api"
 import { Id } from "@/convex/_generated/dataModel"
 import { fetchQuery } from "convex/nextjs"
 
+export const dynamic = "force-dynamic"
 export default async function TranscriptionDetailPage({ params }: { params: Promise<{ id: string }> }) {
     // const params = useParams<{ id: string }>()
     const transcriptionId = (await params).id
