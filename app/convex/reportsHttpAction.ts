@@ -1,9 +1,7 @@
-import { env } from "process";
 import { api } from "./_generated/api";
 import { Id } from "./_generated/dataModel";
 import { httpAction } from "./_generated/server";
 import { ReportInputSchema } from "./types";
-import { v } from "convex/values";
 
 export const postReport = httpAction(async (ctx, req) => {
   const body = await req.json();
@@ -79,7 +77,7 @@ export const uploadReportPDF = httpAction(async (ctx, request) => {
     console.log("Stored PDF with ID:", storageId);
 
     // Step 3: Update the report with the PDF link
-    const pdfLink = `${env.NEXT_PUBLIC_CONVEX_URL}/api/storage/${storageId}`
+    const pdfLink = `${process.env.NEXT_PUBLIC_CONVEX_URL}/api/storage/${storageId}`
     await ctx.runMutation(api.entities.reports.setReportPDF, { id: reportId as Id<"reports">, pdfLink });
     // await ctx.runMutation(api.entities.reports.setReportPDF, { id: reportId, pdfLink: storageId });
 
