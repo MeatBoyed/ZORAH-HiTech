@@ -141,7 +141,7 @@ export default function Step2AssignStaff({
 
   const removeCaptureField = (staffId: string, fieldIndex: number) => {
     const currentFields = staff.find((s: Staff) => s.id === staffId)?.callConfig?.captureFields || [];
-  const updatedFields = currentFields.filter((_: CaptureField, index: number) => index !== fieldIndex);
+    const updatedFields = currentFields.filter((_: CaptureField, index: number) => index !== fieldIndex);
     updateCallConfig(staffId, {
       captureFields: updatedFields
     });
@@ -441,11 +441,11 @@ export default function Step2AssignStaff({
                             </div>
                             <div className="w-24">
                               <Label className="text-xs">Type</Label>
-          <select
+                              <select
                                 value={field.type}
                                 onChange={(e) =>
                                   updateCaptureField(member.id, fieldIndex, {
-            type: e.target.value as CaptureField["type"]
+                                    type: e.target.value as CaptureField["type"]
                                   })
                                 }
                                 className="w-full px-2 py-2 border border-gray-300 rounded-md text-sm"

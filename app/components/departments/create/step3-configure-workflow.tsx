@@ -109,7 +109,7 @@ export default function Step3ConfigureWorkflow({
       ...workflow,
       captureFields: [...workflow.captureFields, { ...newCaptureField }]
     });
-  setNewCaptureField({ name: "", label: "", type: "text", required: false });
+    setNewCaptureField({ name: "", label: "", type: "text", required: false });
   };
 
   const handleRemoveCaptureField = (index: number) => {
@@ -131,7 +131,7 @@ export default function Step3ConfigureWorkflow({
       ...workflow,
       reportFields: [...workflow.reportFields, { ...newReportField }]
     });
-  setNewReportField({ name: "", label: "", type: "text", required: false });
+    setNewReportField({ name: "", label: "", type: "text", required: false });
   };
 
   const handleRemoveReportField = (index: number) => {

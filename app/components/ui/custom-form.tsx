@@ -111,18 +111,18 @@ function FormFieldComponent<TValues extends FieldValues>({ field, form, watchedV
                 );
 
             case "multiselect":
-                                const selectedValues = (Array.isArray(watchedValue) ? watchedValue as string[] : []) || [];
-                                const rolesToContact = Array.isArray((watchedValues as JsonRecord)?.rolesToContact)
-                                    ? ((watchedValues as JsonRecord).rolesToContact as string[])
-                                    : [];
-                                const departments = Array.isArray((watchedValues as JsonRecord)?.departments)
-                                    ? ((watchedValues as JsonRecord).departments as string[])
-                                    : [];
-                                const availableOptions = field.name === "callOrder"
-                                        ? (field.options?.filter(opt => rolesToContact.includes(opt.value)) || [])
-                                        : field.name === "dailyCallDepartments"
-                                                ? (field.options?.filter(opt => departments.includes(opt.value)) || [])
-                                                : field.options || [];
+                const selectedValues = (Array.isArray(watchedValue) ? watchedValue as string[] : []) || [];
+                const rolesToContact = Array.isArray((watchedValues as JsonRecord)?.rolesToContact)
+                    ? ((watchedValues as JsonRecord).rolesToContact as string[])
+                    : [];
+                const departments = Array.isArray((watchedValues as JsonRecord)?.departments)
+                    ? ((watchedValues as JsonRecord).departments as string[])
+                    : [];
+                const availableOptions = field.name === "callOrder"
+                    ? (field.options?.filter(opt => rolesToContact.includes(opt.value)) || [])
+                    : field.name === "dailyCallDepartments"
+                        ? (field.options?.filter(opt => departments.includes(opt.value)) || [])
+                        : field.options || [];
 
                 return (
                     <div className="space-y-3">
@@ -150,17 +150,17 @@ function FormFieldComponent<TValues extends FieldValues>({ field, form, watchedV
 
                                                 // Clean up dependent fields
                                                 if (field.name === "departments") {
-                            const currentDailyCall = ((watchedValues as JsonRecord)?.dailyCallDepartments as string[] | undefined) || [];
-                            form.setValue("dailyCallDepartments" as never, currentDailyCall.filter((v: string) => v !== option.value) as never);
+                                                    const currentDailyCall = ((watchedValues as JsonRecord)?.dailyCallDepartments as string[] | undefined) || [];
+                                                    form.setValue("dailyCallDepartments" as never, currentDailyCall.filter((v: string) => v !== option.value) as never);
                                                 } else if (field.name === "rolesToContact") {
-                            const currentCallOrder = ((watchedValues as JsonRecord)?.callOrder as string[] | undefined) || [];
-                            const currentReportRecipients = ((watchedValues as JsonRecord)?.reportRecipients as string[] | undefined) || [];
-                            form.setValue("callOrder" as never, currentCallOrder.filter((v: string) => v !== option.value) as never);
-                            form.setValue("reportRecipients" as never, currentReportRecipients.filter((v: string) => v !== option.value) as never);
+                                                    const currentCallOrder = ((watchedValues as JsonRecord)?.callOrder as string[] | undefined) || [];
+                                                    const currentReportRecipients = ((watchedValues as JsonRecord)?.reportRecipients as string[] | undefined) || [];
+                                                    form.setValue("callOrder" as never, currentCallOrder.filter((v: string) => v !== option.value) as never);
+                                                    form.setValue("reportRecipients" as never, currentReportRecipients.filter((v: string) => v !== option.value) as never);
                                                 }
                                             }
 
-                        form.setValue(field.name as never, newValues as never, { shouldValidate: true, shouldDirty: true });
+                                            form.setValue(field.name as never, newValues as never, { shouldValidate: true, shouldDirty: true });
                                         }}
                                     />
                                     <label
@@ -262,7 +262,7 @@ function FormFieldComponent<TValues extends FieldValues>({ field, form, watchedV
     return (
         <FormField
             control={form.control}
-                name={field.name as never}
+            name={field.name as never}
             render={() => (
                 <FormItem className="space-y-2">
                     {field.type !== "checkbox" && (
