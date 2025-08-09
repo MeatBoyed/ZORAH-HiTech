@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Plus, Trash2, Phone, ChevronDown, ChevronUp, User, Workflow } from "lucide-react";
-import { DepartmentFormData, Staff } from "@/lib/types/departments";
+import { DepartmentFormData, Staff, CaptureField } from "@/lib/types/departments";
 import { Switch } from "@/components/ui/switch";
 
 interface Step2AssignStaffProps {
@@ -84,13 +84,30 @@ export default function Step2AssignStaff({
     updateFormData({ staff: updatedStaff });
   };
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const updateCallConfig = (staffId: string, configUpdates: any) => {
-    const updatedStaff = staff.map((s: Staff) =>
-      s.id === staffId
-        ? { ...s, callConfig: { ...s.callConfig, ...configUpdates } }
-        : s
-    );
+  const updateCallConfig = (
+    staffId: string,
+    configUpdates: Partial<NonNullable<Staff["callConfig"]>>
+  ) => {
+    const updatedStaff = staff.map((s: Staff) => {
+      if (s.id !== staffId) return s;
+      const existing = s.callConfig ?? {
+        enabled: false,
+        timeoutMinutes: 5,
+        maxRetries: 3,
+        customScript: [],
+        callPurpose: "",
+        captureFields: [],
+        escalationEnabled: false,
+        escalationContacts: [],
+        escalationReason: "",
+        escalationScript: [],
+      };
+      const merged = { ...existing, ...configUpdates };
+      // Ensure required boolean fields aren't undefined after merge
+      if (typeof merged.enabled === "undefined") merged.enabled = existing.enabled;
+      if (typeof merged.escalationEnabled === "undefined") merged.escalationEnabled = existing.escalationEnabled;
+      return { ...s, callConfig: merged };
+    });
     setStaff(updatedStaff);
     updateFormData({ staff: updatedStaff });
   };
@@ -108,10 +125,13 @@ export default function Step2AssignStaff({
     });
   };
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const updateCaptureField = (staffId: string, fieldIndex: number, fieldUpdates: any) => {
+  const updateCaptureField = (
+    staffId: string,
+    fieldIndex: number,
+    fieldUpdates: Partial<CaptureField>
+  ) => {
     const currentFields = staff.find((s: Staff) => s.id === staffId)?.callConfig?.captureFields || [];
-    const updatedFields = currentFields.map((field: any, index: number) =>
+    const updatedFields = currentFields.map((field: CaptureField, index: number) =>
       index === fieldIndex ? { ...field, ...fieldUpdates } : field
     );
     updateCallConfig(staffId, {
@@ -121,7 +141,7 @@ export default function Step2AssignStaff({
 
   const removeCaptureField = (staffId: string, fieldIndex: number) => {
     const currentFields = staff.find((s: Staff) => s.id === staffId)?.callConfig?.captureFields || [];
-    const updatedFields = currentFields.filter((_: any, index: number) => index !== fieldIndex);
+  const updatedFields = currentFields.filter((_: CaptureField, index: number) => index !== fieldIndex);
     updateCallConfig(staffId, {
       captureFields: updatedFields
     });
@@ -393,7 +413,7 @@ export default function Step2AssignStaff({
                       </div>
 
                       <div className="space-y-3">
-                        {(member.callConfig?.captureFields || []).map((field: any, fieldIndex: number) => (
+                        {(member.callConfig?.captureFields || []).map((field: CaptureField, fieldIndex: number) => (
                           <div key={fieldIndex} className="flex gap-2 items-end">
                             <div className="flex-1">
                               <Label className="text-xs">Field Name</Label>
@@ -421,11 +441,11 @@ export default function Step2AssignStaff({
                             </div>
                             <div className="w-24">
                               <Label className="text-xs">Type</Label>
-                              <select
+          <select
                                 value={field.type}
                                 onChange={(e) =>
                                   updateCaptureField(member.id, fieldIndex, {
-                                    type: e.target.value
+            type: e.target.value as CaptureField["type"]
                                   })
                                 }
                                 className="w-full px-2 py-2 border border-gray-300 rounded-md text-sm"

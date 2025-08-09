@@ -38,7 +38,6 @@ export default function Step3ConfigureWorkflow({
   });
 
   // Load template fields when workflow type changes
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
     if (workflow.baseType && WORKFLOW_TEMPLATES[workflow.baseType]) {
       const template = WORKFLOW_TEMPLATES[workflow.baseType];
@@ -47,14 +46,16 @@ export default function Step3ConfigureWorkflow({
           name: field.name,
           label: field.label,
           type: field.type,
-          options: 'options' in field && field.options ? [...field.options] : undefined
+          options: 'options' in field && field.options ? [...field.options] : undefined,
+          required: false,
         }));
 
         const reportFields = template.defaultReportFields.map(field => ({
           name: field.name,
           label: field.label,
           type: field.type,
-          options: 'options' in field && field.options ? [...field.options] : undefined
+          options: 'options' in field && field.options ? [...field.options] : undefined,
+          required: false,
         }));
 
         onUpdate({
@@ -64,7 +65,7 @@ export default function Step3ConfigureWorkflow({
         });
       }
     }
-  }, [workflow.baseType]);
+  }, [workflow, onUpdate]);
 
   const handleBaseTypeChange = (baseType: WorkflowTemplateType) => {
     const template = WORKFLOW_TEMPLATES[baseType];
@@ -73,14 +74,16 @@ export default function Step3ConfigureWorkflow({
       name: field.name,
       label: field.label,
       type: field.type,
-      options: 'options' in field && field.options ? [...field.options] : undefined
+      options: 'options' in field && field.options ? [...field.options] : undefined,
+      required: false,
     }));
 
     const reportFields = template.defaultReportFields.map(field => ({
       name: field.name,
       label: field.label,
       type: field.type,
-      options: 'options' in field && field.options ? [...field.options] : undefined
+      options: 'options' in field && field.options ? [...field.options] : undefined,
+      required: false,
     }));
 
     onUpdate({
@@ -106,7 +109,7 @@ export default function Step3ConfigureWorkflow({
       ...workflow,
       captureFields: [...workflow.captureFields, { ...newCaptureField }]
     });
-    setNewCaptureField({ name: "", label: "", type: "text" });
+  setNewCaptureField({ name: "", label: "", type: "text", required: false });
   };
 
   const handleRemoveCaptureField = (index: number) => {
@@ -128,7 +131,7 @@ export default function Step3ConfigureWorkflow({
       ...workflow,
       reportFields: [...workflow.reportFields, { ...newReportField }]
     });
-    setNewReportField({ name: "", label: "", type: "text" });
+  setNewReportField({ name: "", label: "", type: "text", required: false });
   };
 
   const handleRemoveReportField = (index: number) => {

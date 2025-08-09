@@ -16,12 +16,11 @@ interface Step3WorkflowSummaryProps {
 
 export default function Step3WorkflowSummary({
   formData,
-  updateFormData,
   onNext,
   onPrev,
 }: Step3WorkflowSummaryProps) {
-  const [vapiWorkflow, setVapiWorkflow] = useState<any>(null);
-  const [finalDepartmentObject, setFinalDepartmentObject] = useState<any>(null);
+  const [vapiWorkflow, setVapiWorkflow] = useState<ReturnType<typeof generateVAPIWorkflow> | null>(null);
+  const [finalDepartmentObject, setFinalDepartmentObject] = useState<ReturnType<typeof generateFinalDepartmentObject> | null>(null);
 
   useEffect(() => {
     // Generate VAPI workflow and final department object
@@ -29,23 +28,46 @@ export default function Step3WorkflowSummary({
 
     if (enabledStaff.length > 0 && formData.department) {
       try {
-        const workflow = generateVAPIWorkflow({
-          department: formData.department,
-          staff: formData.staff || [],
-          workflow: formData.workflow || { name: "", description: "", baseType: "daily-check-in" as const },
-          schedule: formData.schedule || { cron: "0 8 * * 1,2,3,4,5", timeZone: "Africa/Johannesburg", enabled: true }
-        });
+        const workflow = generateVAPIWorkflow(
+          {
+            id: "temp-dept",
+            name: formData.department.name,
+            description: formData.department.description,
+            keyResponsibilities: formData.department.keyResponsibilities,
+            staff: formData.staff || [],
+            workflowId: undefined,
+            scheduleId: undefined,
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString(),
+            isActive: true,
+          },
+          formData.staff || []
+        );
 
-        const finalObject = generateFinalDepartmentObject({
-          department: formData.department,
-          staff: formData.staff || [],
-          workflow: formData.workflow || { name: "", description: "", baseType: "daily-check-in" as const },
-          schedule: formData.schedule || { cron: "0 8 * * 1,2,3,4,5", timeZone: "Africa/Johannesburg", enabled: true }
-        });
+        const workflowData = formData.workflow || {
+          name: "",
+          description: "",
+          baseType: "daily-check-in" as const,
+          callPurpose: "",
+          captureFields: [],
+          escalationEnabled: false,
+          reportFields: [],
+        };
+        const scheduleData = formData.schedule || {
+          cron: "0 8 * * 1,2,3,4,5",
+          timeZone: "Africa/Johannesburg",
+          enabled: true,
+        };
+        const finalObject = generateFinalDepartmentObject(
+          { ...formData.department },
+          formData.staff || [],
+          workflowData as unknown as Record<string, unknown>,
+          scheduleData as unknown as Record<string, unknown>
+        );
 
         setVapiWorkflow(workflow);
         setFinalDepartmentObject(finalObject);
-      } catch (error) {
+      } catch (error: unknown) {
         console.error("Error generating workflow:", error);
       }
     }

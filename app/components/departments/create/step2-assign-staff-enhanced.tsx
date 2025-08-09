@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Plus, Trash2, Phone, Settings, ChevronDown, ChevronUp } from "lucide-react";
-import { DepartmentFormData, Staff, StaffRole } from "@/lib/types/departments";
+import { DepartmentFormData, Staff } from "@/lib/types/departments";
 import { Switch } from "@/components/ui/switch";
 
 interface Step2AssignStaffProps {
@@ -15,12 +15,11 @@ interface Step2AssignStaffProps {
   onPrev: () => void;
 }
 
-const STAFF_ROLES: StaffRole[] = [
-  "manager",
-  "supervisor",
-  "senior-staff",
-  "staff",
-  "intern",
+const STAFF_POSITIONS: Array<Staff["position"]> = [
+  "Manager",
+  "Supervisor",
+  "Assistant",
+  "Director",
 ];
 
 export default function Step2AssignStaff({
@@ -36,16 +35,20 @@ export default function Step2AssignStaff({
     const newStaff: Staff = {
       id: `staff_${Date.now()}`,
       name: "",
-      email: "",
       phone: "",
-      role: "staff",
+      position: "Assistant",
       callOrder: staff.length + 1,
       callConfig: {
         enabled: true,
         timeoutMinutes: 5,
         maxRetries: 3,
+        customScript: [],
+        callPurpose: "",
+        captureFields: [],
         escalationEnabled: false,
-        customScript: []
+        escalationContacts: [],
+        escalationReason: "",
+        escalationScript: [],
       }
     };
     const updatedStaff = [...staff, newStaff];
@@ -67,13 +70,29 @@ export default function Step2AssignStaff({
     updateFormData({ staff: updatedStaff });
   };
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const updateCallConfig = (staffId: string, configUpdates: Record<string, any>) => {
-    const updatedStaff = staff.map((s) =>
-      s.id === staffId
-        ? { ...s, callConfig: { ...s.callConfig, ...configUpdates } }
-        : s
-    );
+  const updateCallConfig = (
+    staffId: string,
+    configUpdates: Partial<NonNullable<Staff["callConfig"]>>
+  ) => {
+    const updatedStaff = staff.map((s: Staff) => {
+      if (s.id !== staffId) return s;
+      const existing = s.callConfig ?? {
+        enabled: false,
+        timeoutMinutes: 5,
+        maxRetries: 3,
+        customScript: [],
+        callPurpose: "",
+        captureFields: [],
+        escalationEnabled: false,
+        escalationContacts: [],
+        escalationReason: "",
+        escalationScript: [],
+      };
+      const merged = { ...existing, ...configUpdates };
+      if (typeof merged.enabled === "undefined") merged.enabled = existing.enabled;
+      if (typeof merged.escalationEnabled === "undefined") merged.escalationEnabled = existing.escalationEnabled;
+      return { ...s, callConfig: merged };
+    });
     setStaff(updatedStaff);
     updateFormData({ staff: updatedStaff });
   };
@@ -97,7 +116,7 @@ export default function Step2AssignStaff({
 
     // Validate that all staff have required fields
     const hasEmptyFields = staff.some(
-      (s) => !s.name || !s.email || !s.phone
+      (s) => !s.name || !s.phone
     );
     if (hasEmptyFields) {
       alert("Please fill in all required fields for each staff member");
@@ -165,44 +184,18 @@ export default function Step2AssignStaff({
               </div>
 
               <div>
-                <Label htmlFor={`email-${member.id}`}>Email *</Label>
-                <Input
-                  id={`email-${member.id}`}
-                  type="email"
-                  value={member.email}
-                  onChange={(e) =>
-                    updateStaff(member.id, { email: e.target.value })
-                  }
-                  placeholder="Enter email address"
-                />
-              </div>
-
-              <div>
-                <Label htmlFor={`phone-${member.id}`}>Phone *</Label>
-                <Input
-                  id={`phone-${member.id}`}
-                  type="tel"
-                  value={member.phone}
-                  onChange={(e) =>
-                    updateStaff(member.id, { phone: e.target.value })
-                  }
-                  placeholder="Enter phone number"
-                />
-              </div>
-
-              <div>
-                <Label htmlFor={`role-${member.id}`}>Role</Label>
+                <Label htmlFor={`position-${member.id}`}>Position</Label>
                 <select
-                  id={`role-${member.id}`}
-                  value={member.role}
+                  id={`position-${member.id}`}
+                  value={member.position}
                   onChange={(e) =>
-                    updateStaff(member.id, { role: e.target.value as StaffRole })
+                    updateStaff(member.id, { position: e.target.value as Staff["position"] })
                   }
                   className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                 >
-                  {STAFF_ROLES.map((role) => (
-                    <option key={role} value={role}>
-                      {role.charAt(0).toUpperCase() + role.slice(1).replace('-', ' ')}
+                  {STAFF_POSITIONS.map((position) => (
+                    <option key={position} value={position}>
+                      {position}
                     </option>
                   ))}
                 </select>
@@ -354,7 +347,7 @@ export default function Step2AssignStaff({
                                         className="rounded border-gray-300"
                                       />
                                       <Label htmlFor={`escalation-${member.id}-${contact.id}`}>
-                                        {contact.name || `Staff Member ${staff.indexOf(contact) + 1}`} ({contact.role})
+                                        {contact.name || `Staff Member ${staff.indexOf(contact) + 1}`} ({contact.position})
                                       </Label>
                                     </div>
                                   ))}

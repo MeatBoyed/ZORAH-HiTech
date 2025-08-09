@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import { useForm, UseFormReturn, FieldValues } from "react-hook-form";
+import { DefaultValues, FieldValues, SubmitHandler, useForm, UseFormReturn } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
     Form,
@@ -24,21 +24,23 @@ import { ChevronDown, ChevronUp } from "lucide-react";
 import { FormFieldConfig, FormSectionConfig } from "@/lib/types/assistant-config-simple";
 import { z } from "zod";
 
-interface CustomFormProps {
+type JsonRecord = Record<string, unknown>;
+
+interface CustomFormProps<TValues extends FieldValues = FieldValues> {
     sections: FormSectionConfig[];
-    schema: z.ZodSchema<any>;
-    onSubmit: (data: any) => void;
-    defaultValues?: Record<string, any>;
+    schema: z.ZodType<TValues>;
+    onSubmit: (data: TValues) => void;
+    defaultValues?: Partial<TValues>;
     isSubmitting?: boolean;
 }
 
-interface FormFieldProps {
+interface FormFieldProps<TValues extends FieldValues = FieldValues> {
     field: FormFieldConfig;
-    form: UseFormReturn<any>;
-    watchedValues?: any;
+    form: UseFormReturn<TValues>;
+    watchedValues?: TValues;
 }
 
-function FormFieldComponent({ field, form, watchedValues }: FormFieldProps) {
+function FormFieldComponent<TValues extends FieldValues>({ field, form, watchedValues }: FormFieldProps<TValues>) {
     const watchedValue = watchedValues?.[field.name];
 
     const renderField = () => {
@@ -49,7 +51,7 @@ function FormFieldComponent({ field, form, watchedValues }: FormFieldProps) {
                     <Input
                         type={field.type}
                         placeholder={field.placeholder}
-                        {...form.register(field.name)}
+                        {...form.register(field.name as never)}
                     />
                 );
 
@@ -61,7 +63,7 @@ function FormFieldComponent({ field, form, watchedValues }: FormFieldProps) {
                         step={field.step}
                         min={field.min}
                         max={field.max}
-                        {...form.register(field.name, {
+                        {...form.register(field.name as never, {
                             valueAsNumber: true,
                             setValueAs: (value) => value === "" ? undefined : Number(value)
                         })}
@@ -72,7 +74,7 @@ function FormFieldComponent({ field, form, watchedValues }: FormFieldProps) {
                 return (
                     <Input
                         type="time"
-                        {...form.register(field.name)}
+                        {...form.register(field.name as never)}
                     />
                 );
 
@@ -81,7 +83,7 @@ function FormFieldComponent({ field, form, watchedValues }: FormFieldProps) {
                     <Textarea
                         placeholder={field.placeholder}
                         className="min-h-24"
-                        {...form.register(field.name)}
+                        {...form.register(field.name as never)}
                     />
                 );
 
@@ -89,10 +91,10 @@ function FormFieldComponent({ field, form, watchedValues }: FormFieldProps) {
                 return (
                     <>
                         {/* Register the field with RHF to ensure validation & form state */}
-                        <input type="hidden" {...form.register(field.name)} />
+                        <input type="hidden" {...form.register(field.name as never)} />
                         <Select
-                            onValueChange={(value) => form.setValue(field.name, value, { shouldValidate: true, shouldDirty: true })}
-                            defaultValue={watchedValue}
+                            onValueChange={(value) => form.setValue(field.name as never, value as never, { shouldValidate: true, shouldDirty: true })}
+                            defaultValue={typeof watchedValue === 'string' ? watchedValue : undefined}
                         >
                             <SelectTrigger className="w-full">
                                 <SelectValue placeholder={field.placeholder} />
@@ -109,17 +111,23 @@ function FormFieldComponent({ field, form, watchedValues }: FormFieldProps) {
                 );
 
             case "multiselect":
-                const selectedValues = watchedValue || [];
-                const availableOptions = field.name === "callOrder"
-                    ? (field.options?.filter(opt => watchedValues?.rolesToContact?.includes(opt.value)) || [])
-                    : field.name === "dailyCallDepartments"
-                        ? (field.options?.filter(opt => watchedValues?.departments?.includes(opt.value)) || [])
-                        : field.options || [];
+                                const selectedValues = (Array.isArray(watchedValue) ? watchedValue as string[] : []) || [];
+                                const rolesToContact = Array.isArray((watchedValues as JsonRecord)?.rolesToContact)
+                                    ? ((watchedValues as JsonRecord).rolesToContact as string[])
+                                    : [];
+                                const departments = Array.isArray((watchedValues as JsonRecord)?.departments)
+                                    ? ((watchedValues as JsonRecord).departments as string[])
+                                    : [];
+                                const availableOptions = field.name === "callOrder"
+                                        ? (field.options?.filter(opt => rolesToContact.includes(opt.value)) || [])
+                                        : field.name === "dailyCallDepartments"
+                                                ? (field.options?.filter(opt => departments.includes(opt.value)) || [])
+                                                : field.options || [];
 
                 return (
                     <div className="space-y-3">
                         {/* Register array field so RHF tracks and validates */}
-                        <input type="hidden" {...form.register(field.name)} />
+                        <input type="hidden" {...form.register(field.name as never)} />
                         {availableOptions.length === 0 && field.name !== "departments" && field.name !== "rolesToContact" && (
                             <p className="text-sm text-muted-foreground">
                                 Please select {field.name === "callOrder" ? "roles to contact" : field.name === "dailyCallDepartments" ? "departments" : "options"} first.
@@ -142,17 +150,17 @@ function FormFieldComponent({ field, form, watchedValues }: FormFieldProps) {
 
                                                 // Clean up dependent fields
                                                 if (field.name === "departments") {
-                                                    const currentDailyCall = watchedValues?.dailyCallDepartments || [];
-                                                    form.setValue("dailyCallDepartments", currentDailyCall.filter((v: string) => v !== option.value));
+                            const currentDailyCall = ((watchedValues as JsonRecord)?.dailyCallDepartments as string[] | undefined) || [];
+                            form.setValue("dailyCallDepartments" as never, currentDailyCall.filter((v: string) => v !== option.value) as never);
                                                 } else if (field.name === "rolesToContact") {
-                                                    const currentCallOrder = watchedValues?.callOrder || [];
-                                                    const currentReportRecipients = watchedValues?.reportRecipients || [];
-                                                    form.setValue("callOrder", currentCallOrder.filter((v: string) => v !== option.value));
-                                                    form.setValue("reportRecipients", currentReportRecipients.filter((v: string) => v !== option.value));
+                            const currentCallOrder = ((watchedValues as JsonRecord)?.callOrder as string[] | undefined) || [];
+                            const currentReportRecipients = ((watchedValues as JsonRecord)?.reportRecipients as string[] | undefined) || [];
+                            form.setValue("callOrder" as never, currentCallOrder.filter((v: string) => v !== option.value) as never);
+                            form.setValue("reportRecipients" as never, currentReportRecipients.filter((v: string) => v !== option.value) as never);
                                                 }
                                             }
 
-                                            form.setValue(field.name, newValues, { shouldValidate: true, shouldDirty: true });
+                        form.setValue(field.name as never, newValues as never, { shouldValidate: true, shouldDirty: true });
                                         }}
                                     />
                                     <label
@@ -183,11 +191,11 @@ function FormFieldComponent({ field, form, watchedValues }: FormFieldProps) {
                 return (
                     <div className="flex items-center space-x-2">
                         {/* Register boolean field */}
-                        <input type="hidden" {...form.register(field.name)} />
+                        <input type="hidden" {...form.register(field.name as never)} />
                         <Checkbox
                             id={field.name}
-                            checked={watchedValue || false}
-                            onCheckedChange={(checked) => form.setValue(field.name, !!checked, { shouldValidate: true, shouldDirty: true })}
+                            checked={Boolean(watchedValue)}
+                            onCheckedChange={(checked) => form.setValue(field.name as never, (checked === true) as never, { shouldValidate: true, shouldDirty: true })}
                         />
                         <label
                             htmlFor={field.name}
@@ -202,7 +210,7 @@ function FormFieldComponent({ field, form, watchedValues }: FormFieldProps) {
                 return (
                     <div className="flex gap-6">
                         {/* Register radio field */}
-                        <input type="hidden" {...form.register(field.name)} />
+                        <input type="hidden" {...form.register(field.name as never)} />
                         {field.options?.map((option) => (
                             <div key={option.value} className="flex items-center space-x-2">
                                 <input
@@ -210,7 +218,7 @@ function FormFieldComponent({ field, form, watchedValues }: FormFieldProps) {
                                     id={`${field.name}-${option.value}`}
                                     value={option.value}
                                     checked={watchedValue === option.value}
-                                    onChange={(e) => form.setValue(field.name, e.target.value, { shouldValidate: true, shouldDirty: true })}
+                                    onChange={(e) => form.setValue(field.name as never, e.target.value as never, { shouldValidate: true, shouldDirty: true })}
                                     className="w-4 h-4"
                                 />
                                 <label
@@ -225,7 +233,7 @@ function FormFieldComponent({ field, form, watchedValues }: FormFieldProps) {
                 );
 
             default:
-                return <Input placeholder={field.placeholder} {...form.register(field.name)} />;
+                return <Input placeholder={field.placeholder} {...form.register(field.name as never)} />;
         }
     };
 
@@ -233,7 +241,7 @@ function FormFieldComponent({ field, form, watchedValues }: FormFieldProps) {
         return (
             <FormField
                 control={form.control}
-                name={field.name}
+                name={field.name as never}
                 render={() => (
                     <FormItem className="flex flex-row items-start space-x-3 space-y-0">
                         <FormControl>
@@ -254,7 +262,7 @@ function FormFieldComponent({ field, form, watchedValues }: FormFieldProps) {
     return (
         <FormField
             control={form.control}
-            name={field.name}
+                name={field.name as never}
             render={() => (
                 <FormItem className="space-y-2">
                     {field.type !== "checkbox" && (
@@ -276,13 +284,13 @@ function FormFieldComponent({ field, form, watchedValues }: FormFieldProps) {
     );
 }
 
-export function CustomForm({ sections, schema, onSubmit, defaultValues, isSubmitting = false }: CustomFormProps) {
+export function CustomForm<TValues extends FieldValues>({ sections, schema, onSubmit, defaultValues, isSubmitting = false }: CustomFormProps<TValues>) {
     const [openSections, setOpenSections] = useState<Set<number>>(new Set([0])); // First section open by default
 
-    const form = useForm<any>({
+    const form = useForm<TValues>({
         // Type cast is required due to @hookform/resolvers types expecting Zod v3 while project uses Zod v4
-        resolver: (zodResolver as any)(schema as any) as any,
-        defaultValues: defaultValues || {},
+        resolver: (zodResolver as unknown as (s: z.ZodType<TValues>) => unknown)(schema) as never,
+        defaultValues: (defaultValues || {}) as DefaultValues<TValues>,
     });
 
     const watchedValues = form.watch();
@@ -297,13 +305,13 @@ export function CustomForm({ sections, schema, onSubmit, defaultValues, isSubmit
         setOpenSections(newOpenSections);
     };
 
-    const handleSubmit = (data: any) => {
+    const handleSubmit = (data: TValues) => {
         onSubmit(data);
     };
 
     return (
-        <Form {...form}>
-            <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-8">
+        <Form {...(form as unknown as UseFormReturn<TValues>)}>
+            <form onSubmit={form.handleSubmit(((data: unknown) => handleSubmit(data as TValues)) as unknown as SubmitHandler<FieldValues>)} className="space-y-8">
                 {sections.map((section, sectionIndex) => (
                     <Card key={sectionIndex}>
                         <Collapsible
@@ -335,8 +343,8 @@ export function CustomForm({ sections, schema, onSubmit, defaultValues, isSubmit
                                             >
                                                 <FormFieldComponent
                                                     field={field}
-                                                    form={form}
-                                                    watchedValues={watchedValues}
+                                                    form={form as unknown as UseFormReturn<TValues>}
+                                                    watchedValues={watchedValues as TValues}
                                                 />
                                             </div>
                                         ))}

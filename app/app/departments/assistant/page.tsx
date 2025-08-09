@@ -2,13 +2,13 @@
 
 import { CustomForm } from "@/components/ui/custom-form";
 import { AI_ASSISTANT_FORM_CONFIG } from "@/lib/config/assistant-form-config";
-import { AIAssistantConfigSchema } from "@/lib/types/assistant-config-simple";
+import { AIAssistantConfigSchema, AIAssistantConfig } from "@/lib/types/assistant-config-simple";
 import { toast } from "sonner";
 
 const WEBHOOK_URL = "https://primary-production-16d21.up.railway.app/webhook/ae207070-4461-4ddb-9535-f3b847890104";
 
 export default function AssistantConfigPage() {
-  const handleSubmit = async (data: any) => {
+  const handleSubmit = async (data: AIAssistantConfig) => {
     try {
       const res = await fetch(WEBHOOK_URL, {
         method: "POST",
@@ -27,9 +27,10 @@ export default function AssistantConfigPage() {
       }
 
       toast.success("Configuration submitted successfully");
-    } catch (err: any) {
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : "Unknown error";
       toast.error("Failed to submit configuration", {
-        description: err?.message || "Unknown error",
+        description: message,
       });
     }
   };

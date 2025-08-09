@@ -4,7 +4,7 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { DepartmentFormData } from "@/lib/types/departments";
+import { DepartmentFormData, Staff } from "@/lib/types/departments";
 import { generateFinalDepartmentObject, generateVAPIFunctionCall } from "@/lib/utils/workflow-generator";
 import {
   CheckCircle,
@@ -34,17 +34,32 @@ export default function Step6ReviewAndSave({
   const [showVAPICode, setShowVAPICode] = useState(false);
 
   // Generate the final objects
+  const departmentData = formData.department || { name: "", description: "", keyResponsibilities: "" };
+  const workflowData = formData.workflow || {
+    name: "",
+    description: "",
+    baseType: "daily-check-in" as const,
+    callPurpose: "",
+    captureFields: [],
+    escalationEnabled: false,
+    reportFields: [],
+  };
+  const scheduleData = formData.schedule || {
+    cron: "0 9 * * 1-5",
+    timeZone: "Africa/Johannesburg",
+    enabled: true,
+  };
   const finalObject = generateFinalDepartmentObject(
-    formData.department,
+    departmentData as unknown as Record<string, unknown>,
     formData.staff || [],
-    formData.workflow,
-    formData.schedule
+    workflowData as unknown as Record<string, unknown>,
+    scheduleData as unknown as Record<string, unknown>
   );
 
   const vapiCode = generateVAPIFunctionCall(finalObject);
 
-  const enabledStaff = (formData.staff || []).filter((s: any) => s.callConfig?.enabled);
-  const escalationEnabledStaff = enabledStaff.filter((s: any) => s.callConfig?.escalationEnabled);
+  const enabledStaff: Staff[] = (formData.staff || []).filter((s): s is Staff => !!s.callConfig?.enabled);
+  const escalationEnabledStaff: Staff[] = enabledStaff.filter((s): s is Staff => !!s.callConfig?.escalationEnabled);
 
   return (
     <div className="space-y-6">
@@ -137,13 +152,13 @@ export default function Step6ReviewAndSave({
           <div>
             <h4 className="font-semibold mb-2">Staff Call Configuration</h4>
             <div className="space-y-2">
-              {enabledStaff.map((staff: any) => (
+              {enabledStaff.map((staff) => (
                 <div key={staff.id} className="flex items-center justify-between p-3 border rounded-lg">
                   <div className="flex items-center gap-3">
                     <Badge variant="outline">Order {staff.callOrder}</Badge>
                     <div>
                       <p className="font-medium">{staff.name}</p>
-                      <p className="text-xs text-gray-600">{staff.role} • {staff.phone}</p>
+                      <p className="text-xs text-gray-600">{staff.position} • {staff.phone}</p>
                     </div>
                   </div>
                   <div className="flex gap-2">
