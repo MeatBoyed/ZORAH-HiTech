@@ -3,16 +3,6 @@ import { httpAction, mutation, query } from "../_generated/server";
 import { v } from "convex/values";
 import { api } from "../_generated/api";
 
-// // export const postReport = httpAction(async (ctx, req) => {
-// //     const { status, data } = await req.json();
-
-// //     await ctx.runMutation(api.reports.create, data)
-
-// //     return new Response(null, {
-// //         status: 200,
-// //     });
-// // })
-
 export const list = query({
     args: { limit: v.optional(v.number()), offset: v.optional(v.number()) },
     handler: async (ctx, { limit = 20, offset = 0 }) => {
@@ -32,7 +22,6 @@ export const show = query({
             report: report,
             calls: callIds,
         }
-        // do something with `report`
     },
 });
 

@@ -208,8 +208,6 @@ export function PaginatedTable<T>({
                                                     ['@md']: column.hidden === 'md' ? 'table-cell' : undefined,
                                                     ['@lg']: column.hidden === 'lg' ? 'table-cell' : undefined,
                                                     ['@xl']: column.hidden === 'xl' ? 'table-cell' : undefined,
-                                                    // eslint-disable-next-line 
-                                                    // @typescript-eslint/no-explicit-any
                                                 } as React.CSSProperties}
                                             >
                                                 {column.accessor(item)}
